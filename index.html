@@ -20,6 +20,8 @@
 
 <body id="body">
 
+<!-- START SCREEN -->
+
 <div id="startScreen" class="startScreen">
 
 <h1>Landslide Risk Prediction System</h1>
@@ -27,6 +29,8 @@
 <button onclick="startApp()">Predict Landslides</button>
 
 </div>
+
+<!-- MAIN APP -->
 
 <div id="app" class="container" style="display:none;">
 
@@ -49,6 +53,7 @@
 <h3 id="result"></h3>
 
 <h4>Risk Gauge</h4>
+
 <div class="gauge">
 <div id="gaugeFill"></div>
 </div>
@@ -56,6 +61,7 @@
 <div id="explanation"></div>
 
 <h3>Prediction History</h3>
+
 <ul id="history"></ul>
 
 <h3>Landslide Education</h3>
@@ -98,59 +104,79 @@ loadHistory();
 
 function predict(){
 
-let rainfall=parseFloat(document.getElementById("rainfall").value);
-let slope=parseFloat(document.getElementById("slope").value);
-let soil=parseInt(document.getElementById("soil").value);
-let vegetation=parseFloat(document.getElementById("vegetation").value);
+let rainfall = parseFloat(document.getElementById("rainfall").value);
+let slope = parseFloat(document.getElementById("slope").value);
+let soil = parseInt(document.getElementById("soil").value);
+let vegetation = parseFloat(document.getElementById("vegetation").value);
 
-let risk_score=0;
-let reasons=[];
+let risk_score = 0;
+let reasons = [];
 
-if(rainfall>250){risk_score+=2; reasons.push("Heavy rainfall");}
-else if(rainfall>150){risk_score+=1;}
+if(rainfall > 250){
+risk_score += 2;
+reasons.push("Heavy rainfall");
+}
+else if(rainfall > 150){
+risk_score += 1;
+}
 
-if(slope>30){risk_score+=2; reasons.push("Steep slope");}
-else if(slope>15){risk_score+=1;}
+if(slope > 30){
+risk_score += 2;
+reasons.push("Steep slope");
+}
+else if(slope > 15){
+risk_score += 1;
+}
 
-if(soil==1){risk_score+=2; reasons.push("Clay soil");}
-else if(soil==2){risk_score+=1;}
+if(soil == 1){
+risk_score += 2;
+reasons.push("Clay soil");
+}
+else if(soil == 2){
+risk_score += 1;
+}
 
-if(vegetation<0.3){risk_score+=2; reasons.push("Low vegetation");}
-else if(vegetation<0.6){risk_score+=1;}
+if(vegetation < 0.3){
+risk_score += 2;
+reasons.push("Low vegetation");
+}
+else if(vegetation < 0.6){
+risk_score += 1;
+}
 
-let result="";
-let gaugeWidth=0;
+let result = "";
+let gaugeWidth = 0;
 
-if(risk_score>=5){
+if(risk_score >= 5){
 
-result="🚨 High Risk of Landslide";
-gaugeWidth=100;
-document.body.style.background="#ff4b4b";
+result = "🚨 High Risk of Landslide";
+gaugeWidth = 100;
+document.body.style.background = "#ff4b4b";
 
 }
 
-else if(risk_score>=3){
+else if(risk_score >= 3){
 
-result="⚠️ Moderate Risk of Landslide";
-gaugeWidth=60;
-document.body.style.background="#ffb347";
+result = "⚠️ Moderate Risk of Landslide";
+gaugeWidth = 60;
+document.body.style.background = "#ffb347";
 
 }
 
 else{
 
-result="🟢 Low Risk of Landslide";
-gaugeWidth=30;
-document.body.style.background="#93f9b9";
+result = "🟢 Low Risk of Landslide";
+gaugeWidth = 30;
+document.body.style.background = "#93f9b9";
 
 }
 
-document.getElementById("result").innerHTML=result;
+document.getElementById("result").innerHTML = result;
 
-document.getElementById("explanation").innerHTML=
-"<b>Explain Prediction:</b> "+reasons.join(", ");
+document.getElementById("explanation").innerHTML =
+"<b>Explain Prediction:</b> " + reasons.join(", ");
 
-document.getElementById("gaugeFill").style.width=gaugeWidth+"%";
+document.getElementById("gaugeFill").style.width = gaugeWidth + "%";
 
 saveHistory(result);
 
@@ -160,14 +186,35 @@ loadHistory();
 
 function saveHistory(result){
 
-let history=JSON.parse(localStorage.getItem("landslideHistory"))||[];
+let history = JSON.parse(localStorage.getItem("landslideHistory")) || [];
 
-history.push(result+" ("+new Date().toLocaleString()+")");
+history.push(result + " (" + new Date().toLocaleString() + ")");
 
-localStorage.setItem("landslideHistory",JSON.stringify(history));
+localStorage.setItem("landslideHistory", JSON.stringify(history));
 
 }
 
 function loadHistory(){
 
-let history=JSON.parse(localStorage.getItem("landslideHistory"))
+let history = JSON.parse(localStorage.getItem("landslideHistory")) || [];
+
+let list = document.getElementById("history");
+
+list.innerHTML = "";
+
+history.slice(-5).reverse().forEach(function(item){
+
+let li = document.createElement("li");
+
+li.textContent = item;
+
+list.appendChild(li);
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
