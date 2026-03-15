@@ -3,20 +3,22 @@
 <html>
 
 <head>
-  
-<meta name="description" content="Landslide Risk Prediction System using rainfall, slope, soil type and vegetation parameters. Developed by Sai Charan.">
-<meta name="keywords" content="landslide risk predictor, landslide prediction system, Sai Charan project">
+
 <title>Landslide Risk Predictor</title>
 
 <meta name="description" content="Landslide Risk Prediction System using rainfall, slope, soil type and vegetation parameters. Developed by Sai Charan.">
 
-<meta name="keywords" content="Landslide prediction, disaster monitoring, rainfall slope analysis">
+<meta name="keywords" content="landslide risk predictor, landslide prediction system, Sai Charan project">
 
 <meta name="author" content="Sai Charan">
 
 <meta name="robots" content="index, follow">
 
 <link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 </head>
 
@@ -37,6 +39,10 @@
 <div id="app" class="container" style="display:none;">
 
 <h2>Landslide Risk Predictor</h2>
+
+<p id="location">📍 Detecting location...</p>
+
+<div id="map"></div>
 
 <input type="number" id="rainfall" placeholder="Rainfall (mm)">
 
@@ -61,6 +67,8 @@
 </div>
 
 <div id="explanation"></div>
+
+<div id="tips"></div>
 
 <h3>Prediction History</h3>
 
@@ -95,17 +103,54 @@
 
 <script>
 
+let map;
+
 function startApp(){
 
-let start = document.getElementById("startScreen");
-let app = document.getElementById("app");
+document.getElementById("startScreen").style.display="none";
+document.getElementById("app").style.display="block";
 
-start.style.display = "none";
-app.style.display = "block";
-
+detectLocation();
 loadHistory();
 
 }
+
+
+function detectLocation(){
+
+if(navigator.geolocation){
+
+navigator.geolocation.getCurrentPosition(function(position){
+
+let lat = position.coords.latitude;
+let lon = position.coords.longitude;
+
+document.getElementById("location").innerHTML =
+"📍 Location detected: " + lat.toFixed(3) + ", " + lon.toFixed(3);
+
+initMap(lat,lon);
+
+});
+
+}
+
+}
+
+
+function initMap(lat,lon){
+
+map = L.map('map').setView([lat,lon],10);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+maxZoom:19
+}).addTo(map);
+
+L.marker([lat,lon]).addTo(map)
+.bindPopup("Your Location")
+.openPopup();
+
+}
+
 
 function predict(){
 
@@ -117,37 +162,17 @@ let vegetation = parseFloat(document.getElementById("vegetation").value) || 0;
 let risk_score = 0;
 let reasons = [];
 
-if(rainfall > 250){
-risk_score += 2;
-reasons.push("Heavy rainfall");
-}
-else if(rainfall > 150){
-risk_score += 1;
-}
+if(rainfall > 250){risk_score += 2; reasons.push("Heavy rainfall");}
+else if(rainfall > 150){risk_score += 1;}
 
-if(slope > 30){
-risk_score += 2;
-reasons.push("Steep slope");
-}
-else if(slope > 15){
-risk_score += 1;
-}
+if(slope > 30){risk_score += 2; reasons.push("Steep slope");}
+else if(slope > 15){risk_score += 1;}
 
-if(soil == 1){
-risk_score += 2;
-reasons.push("Clay soil");
-}
-else if(soil == 2){
-risk_score += 1;
-}
+if(soil == 1){risk_score += 2; reasons.push("Clay soil");}
+else if(soil == 2){risk_score += 1;}
 
-if(vegetation < 0.3){
-risk_score += 2;
-reasons.push("Low vegetation");
-}
-else if(vegetation < 0.6){
-risk_score += 1;
-}
+if(vegetation < 0.3){risk_score += 2; reasons.push("Low vegetation");}
+else if(vegetation < 0.6){risk_score += 1;}
 
 let result = "";
 let gaugeWidth = 0;
@@ -158,13 +183,19 @@ result = "🚨 High Risk of Landslide";
 gaugeWidth = 100;
 document.body.style.background = "#ff4b4b";
 
+document.getElementById("tips").innerHTML =
+"<b>⚠ Safety Warning:</b> Avoid steep slopes and move to safer areas.";
+
 }
 
 else if(risk_score >= 3){
 
-result = "⚠️ Moderate Risk of Landslide";
+result = "⚠ Moderate Risk of Landslide";
 gaugeWidth = 60;
 document.body.style.background = "#ffb347";
+
+document.getElementById("tips").innerHTML =
+"Be cautious near hills and unstable slopes.";
 
 }
 
@@ -173,6 +204,9 @@ else{
 result = "🟢 Low Risk of Landslide";
 gaugeWidth = 30;
 document.body.style.background = "#93f9b9";
+
+document.getElementById("tips").innerHTML =
+"Area appears relatively safe.";
 
 }
 
@@ -188,6 +222,7 @@ loadHistory();
 
 }
 
+
 function saveHistory(result){
 
 let history = JSON.parse(localStorage.getItem("landslideHistory")) || [];
@@ -197,6 +232,7 @@ history.push(result + " (" + new Date().toLocaleString() + ")");
 localStorage.setItem("landslideHistory", JSON.stringify(history));
 
 }
+
 
 function loadHistory(){
 
@@ -219,5 +255,6 @@ list.appendChild(li);
 }
 
 </script>
+
 </body>
 </html>
