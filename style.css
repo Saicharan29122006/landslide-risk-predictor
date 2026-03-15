@@ -178,3 +178,8 @@ font-size:18px;
 font-weight:bold;
 
 }
+#map{
+height:300px;
+margin-top:20px;
+border-radius:10px;
+}
