@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Landslide Risk Predictor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Landslide Risk Predictor</h1>
+
+<input type="number" id="rainfall" placeholder="Rainfall (mm)">
+
+<input type="number" id="slope" placeholder="Slope Angle (degrees)">
+
+<select id="soil">
+<option value="0">Rocky Soil</option>
+<option value="1">Clay Soil</option>
+<option value="2">Sandy Soil</option>
+</select>
+
+<input type="number" step="0.1" id="vegetation" placeholder="Vegetation Index (0 - 1)">
+
+<button onclick="predict()">Predict Risk</button>
+
+<div class="meter">
+<div id="riskBar"></div>
+</div>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+function predict(){
+
+let rainfall = parseFloat(document.getElementById("rainfall").value);
+let slope = parseFloat(document.getElementById("slope").value);
+let soil = parseInt(document.getElementById("soil").value);
+let vegetation = parseFloat(document.getElementById("vegetation").value);
+
+let risk_score = 0;
+
+if(rainfall > 250) risk_score += 2;
+else if(rainfall > 150) risk_score += 1;
+
+if(slope > 30) risk_score += 2;
+else if(slope > 15) risk_score += 1;
+
+if(soil == 1) risk_score += 2;
+else if(soil == 2) risk_score += 1;
+
+if(vegetation < 0.3) risk_score += 2;
+else if(vegetation < 0.6) risk_score += 1;
+
+let result="";
+let width=0;
+let color="green";
+
+if(risk_score >=5){
+result="🚨 High Risk of Landslide";
+width=100;
+color="red";
+}
+else if(risk_score >=3){
+result="⚠️ Moderate Risk of Landslide";
+width=60;
+color="orange";
+}
+else{
+result="🟢 Low Risk of Landslide";
+width=30;
+color="green";
+}
+
+document.getElementById("result").innerHTML=result;
+
+let bar=document.getElementById("riskBar");
+bar.style.width=width+"%";
+bar.style.background=color;
+
+}
+
+</script>
+
+</body>
+</html>
