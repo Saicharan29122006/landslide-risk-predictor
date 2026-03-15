@@ -2,16 +2,33 @@
 <html>
 
 <head>
-  <meta name="google-site-verification" content="Si9ywmV01GfmUIc4o9eVyRdep6je6f4wr332DXhpTps" />
+<meta name="google-site-verification" content="Si9ywmV01GfmUIc4o9eVyRdep6je6f4wr332DXhpTps" />
   <meta name="description" content="Landslide Risk Prediction System using rainfall, slope, soil type and vegetation parameters. Developed by Sai Charan.">
 <meta name="keywords" content="Landslide prediction, disaster monitoring, rainfall slope analysis">
-  <title>Landslide Risk Predictor</title>
+<title>Landslide Risk Predictor</title>
+
+<meta name="description" content="Landslide Risk Prediction System">
+
 <link rel="stylesheet" href="style.css">
+
 </head>
 
-<body>
+<body id="body">
 
-<div class="container">
+<!-- START SCREEN -->
+
+<div id="startScreen" class="startScreen">
+
+<h1>Landslide Risk Prediction System</h1>
+
+<button onclick="startApp()">Predict Landslides</button>
+
+</div>
+
+
+<!-- MAIN APP -->
+
+<div id="app" class="container" style="display:none;">
 
 <h1>Landslide Risk Predictor</h1>
 
@@ -37,53 +54,99 @@
 
 </div>
 
+
 <script>
+
+
+function startApp(){
+
+document.getElementById("startScreen").style.display="none";
+
+document.getElementById("app").style.display="block";
+
+}
+
+
 
 function predict(){
 
-let rainfall = parseFloat(document.getElementById("rainfall").value);
-let slope = parseFloat(document.getElementById("slope").value);
-let soil = parseInt(document.getElementById("soil").value);
-let vegetation = parseFloat(document.getElementById("vegetation").value);
+let rainfall=parseFloat(document.getElementById("rainfall").value);
 
-let risk_score = 0;
+let slope=parseFloat(document.getElementById("slope").value);
 
-if(rainfall > 250) risk_score += 2;
-else if(rainfall > 150) risk_score += 1;
+let soil=parseInt(document.getElementById("soil").value);
 
-if(slope > 30) risk_score += 2;
-else if(slope > 15) risk_score += 1;
+let vegetation=parseFloat(document.getElementById("vegetation").value);
 
-if(soil == 1) risk_score += 2;
-else if(soil == 2) risk_score += 1;
+let risk_score=0;
 
-if(vegetation < 0.3) risk_score += 2;
-else if(vegetation < 0.6) risk_score += 1;
+
+if(rainfall>250) risk_score+=2;
+else if(rainfall>150) risk_score+=1;
+
+
+if(slope>30) risk_score+=2;
+else if(slope>15) risk_score+=1;
+
+
+if(soil==1) risk_score+=2;
+else if(soil==2) risk_score+=1;
+
+
+if(vegetation<0.3) risk_score+=2;
+else if(vegetation<0.6) risk_score+=1;
+
 
 let result="";
 let width=0;
 let color="green";
 
-if(risk_score >=5){
+
+if(risk_score>=5){
+
 result="🚨 High Risk of Landslide";
+
 width=100;
+
 color="red";
+
+document.body.style.background="linear-gradient(135deg,#ff4b4b,#ff0000)";
+
 }
-else if(risk_score >=3){
+
+
+else if(risk_score>=3){
+
 result="⚠️ Moderate Risk of Landslide";
+
 width=60;
+
 color="orange";
+
+document.body.style.background="linear-gradient(135deg,#ffb347,#ff8000)";
+
 }
+
+
 else{
+
 result="🟢 Low Risk of Landslide";
+
 width=30;
+
 color="green";
+
+document.body.style.background="linear-gradient(135deg,#1d976c,#93f9b9)";
+
 }
+
 
 document.getElementById("result").innerHTML=result;
 
 let bar=document.getElementById("riskBar");
+
 bar.style.width=width+"%";
+
 bar.style.background=color;
 
 }
@@ -91,4 +154,5 @@ bar.style.background=color;
 </script>
 
 </body>
+
 </html>
