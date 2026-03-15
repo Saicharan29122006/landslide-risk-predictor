@@ -16,17 +16,9 @@
 
 <link rel="stylesheet" href="style.css">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 </head>
 
 <body id="body">
-
-<!-- START SCREEN -->
 
 <div id="startScreen" class="startScreen">
 
@@ -36,13 +28,9 @@
 
 </div>
 
-<!-- MAIN APP -->
-
 <div id="app" class="container" style="display:none;">
 
 <h2>Landslide Risk Predictor</h2>
-
-<p id="location">Detecting location...</p>
 
 <input type="number" id="rainfall" placeholder="Rainfall (mm)">
 
@@ -58,170 +46,128 @@
 
 <button onclick="predict()">Predict Risk</button>
 
-<div class="meter">
-<div id="riskBar"></div>
-</div>
-
 <h3 id="result"></h3>
 
-<div id="reason"></div>
+<h4>Risk Gauge</h4>
+<div class="gauge">
+<div id="gaugeFill"></div>
+</div>
 
-<div id="tips"></div>
+<div id="explanation"></div>
 
-<canvas id="riskChart"></canvas>
+<h3>Prediction History</h3>
+<ul id="history"></ul>
 
-<div id="map"></div>
+<h3>Landslide Education</h3>
+
+<div class="education">
+
+<p><b>What causes landslides?</b></p>
+
+<ul>
+<li>Heavy rainfall</li>
+<li>Steep slopes</li>
+<li>Weak or clay soil</li>
+<li>Low vegetation</li>
+<li>Earthquakes or human activities</li>
+</ul>
+
+<p><b>Safety Tips:</b></p>
+
+<ul>
+<li>Avoid building near steep slopes</li>
+<li>Stay alert during heavy rainfall</li>
+<li>Plant vegetation to stabilize soil</li>
+<li>Follow evacuation warnings</li>
+</ul>
+
+</div>
 
 </div>
 
 <script>
-
-let map;
 
 function startApp(){
 
 document.getElementById("startScreen").style.display="none";
 document.getElementById("app").style.display="block";
 
-detectLocation();
-
-}
-
-function detectLocation(){
-
-if(navigator.geolocation){
-
-navigator.geolocation.getCurrentPosition(function(position){
-
-let lat = position.coords.latitude;
-let lon = position.coords.longitude;
-
-document.getElementById("location").innerHTML="📍 Location detected";
-
-initMap(lat,lon);
-
-});
-
-}
-
-}
-
-function initMap(lat,lon){
-
-map = L.map('map').setView([lat,lon],10);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-maxZoom:19
-}).addTo(map);
-
-L.marker([lat,lon]).addTo(map)
-.bindPopup("Your Location")
-.openPopup();
+loadHistory();
 
 }
 
 function predict(){
 
-let rainfall = parseFloat(document.getElementById("rainfall").value);
-let slope = parseFloat(document.getElementById("slope").value);
-let soil = parseInt(document.getElementById("soil").value);
-let vegetation = parseFloat(document.getElementById("vegetation").value);
+let rainfall=parseFloat(document.getElementById("rainfall").value);
+let slope=parseFloat(document.getElementById("slope").value);
+let soil=parseInt(document.getElementById("soil").value);
+let vegetation=parseFloat(document.getElementById("vegetation").value);
 
-let risk_score = 0;
-
+let risk_score=0;
 let reasons=[];
 
-let rainfallScore=0;
-let slopeScore=0;
-let soilScore=0;
-let vegScore=0;
+if(rainfall>250){risk_score+=2; reasons.push("Heavy rainfall");}
+else if(rainfall>150){risk_score+=1;}
 
-if(rainfall>250){risk_score+=2; rainfallScore=2; reasons.push("Heavy rainfall");}
-else if(rainfall>150){risk_score+=1; rainfallScore=1;}
+if(slope>30){risk_score+=2; reasons.push("Steep slope");}
+else if(slope>15){risk_score+=1;}
 
-if(slope>30){risk_score+=2; slopeScore=2; reasons.push("Steep slope");}
-else if(slope>15){risk_score+=1; slopeScore=1;}
+if(soil==1){risk_score+=2; reasons.push("Clay soil");}
+else if(soil==2){risk_score+=1;}
 
-if(soil==1){risk_score+=2; soilScore=2; reasons.push("Clay soil");}
-else if(soil==2){risk_score+=1; soilScore=1;}
-
-if(vegetation<0.3){risk_score+=2; vegScore=2; reasons.push("Low vegetation");}
-else if(vegetation<0.6){risk_score+=1; vegScore=1;}
+if(vegetation<0.3){risk_score+=2; reasons.push("Low vegetation");}
+else if(vegetation<0.6){risk_score+=1;}
 
 let result="";
-let width=0;
-let color="green";
+let gaugeWidth=0;
 
 if(risk_score>=5){
 
 result="🚨 High Risk of Landslide";
-width=100;
-color="red";
-
-document.body.style.background="linear-gradient(135deg,#ff4b4b,#ff0000)";
-
-document.getElementById("tips").innerHTML=
-"<h4>⚠ Safety Tips</h4> Avoid steep slopes and move to safe areas.";
+gaugeWidth=100;
+document.body.style.background="#ff4b4b";
 
 }
 
 else if(risk_score>=3){
 
 result="⚠️ Moderate Risk of Landslide";
-width=60;
-color="orange";
-
-document.body.style.background="linear-gradient(135deg,#ffb347,#ff8000)";
-
-document.getElementById("tips").innerHTML=
-"<h4>Be cautious near hills and slopes.</h4>";
+gaugeWidth=60;
+document.body.style.background="#ffb347";
 
 }
 
 else{
 
 result="🟢 Low Risk of Landslide";
-width=30;
-color="green";
-
-document.body.style.background="linear-gradient(135deg,#1d976c,#93f9b9)";
-
-document.getElementById("tips").innerHTML="Area appears safe.";
+gaugeWidth=30;
+document.body.style.background="#93f9b9";
 
 }
 
 document.getElementById("result").innerHTML=result;
 
-document.getElementById("reason").innerHTML="Reason: "+reasons.join(", ");
+document.getElementById("explanation").innerHTML=
+"<b>Explain Prediction:</b> "+reasons.join(", ");
 
-let bar=document.getElementById("riskBar");
+document.getElementById("gaugeFill").style.width=gaugeWidth+"%";
 
-bar.style.width=width+"%";
-bar.style.background=color;
+saveHistory(result);
 
-createChart(rainfallScore,slopeScore,soilScore,vegScore);
-
-}
-
-function createChart(r,s,so,v){
-
-new Chart(document.getElementById("riskChart"),{
-
-type:'bar',
-
-data:{
-labels:["Rainfall","Slope","Soil","Vegetation"],
-datasets:[{
-label:"Risk Contribution",
-data:[r,s,so,v]
-}]
-}
-
-});
+loadHistory();
 
 }
 
-</script>
+function saveHistory(result){
 
-</body>
-</html>
+let history=JSON.parse(localStorage.getItem("landslideHistory"))||[];
+
+history.push(result+" ("+new Date().toLocaleString()+")");
+
+localStorage.setItem("landslideHistory",JSON.stringify(history));
+
+}
+
+function loadHistory(){
+
+let history=JSON.parse(localStorage.getItem("landslideHistory"))
