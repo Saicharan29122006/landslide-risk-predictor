@@ -97,8 +97,11 @@
 
 function startApp(){
 
-document.getElementById("startScreen").style.display="none";
-document.getElementById("app").style.display="block";
+let start = document.getElementById("startScreen");
+let app = document.getElementById("app");
+
+start.style.display = "none";
+app.style.display = "block";
 
 loadHistory();
 
@@ -106,10 +109,10 @@ loadHistory();
 
 function predict(){
 
-let rainfall = parseFloat(document.getElementById("rainfall").value);
-let slope = parseFloat(document.getElementById("slope").value);
-let soil = parseInt(document.getElementById("soil").value);
-let vegetation = parseFloat(document.getElementById("vegetation").value);
+let rainfall = parseFloat(document.getElementById("rainfall").value) || 0;
+let slope = parseFloat(document.getElementById("slope").value) || 0;
+let soil = parseInt(document.getElementById("soil").value) || 0;
+let vegetation = parseFloat(document.getElementById("vegetation").value) || 0;
 
 let risk_score = 0;
 let reasons = [];
@@ -176,12 +179,11 @@ document.body.style.background = "#93f9b9";
 document.getElementById("result").innerHTML = result;
 
 document.getElementById("explanation").innerHTML =
-"<b>Explain Prediction:</b> " + reasons.join(", ");
+"<b>Explain Prediction:</b> " + (reasons.length ? reasons.join(", ") : "Conditions safe");
 
 document.getElementById("gaugeFill").style.width = gaugeWidth + "%";
 
 saveHistory(result);
-
 loadHistory();
 
 }
@@ -217,6 +219,5 @@ list.appendChild(li);
 }
 
 </script>
-
 </body>
 </html>
